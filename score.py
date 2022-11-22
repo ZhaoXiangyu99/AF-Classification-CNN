@@ -53,13 +53,21 @@ def cal_score(prediction_path : str = "", reference_path : str = ""):
             pred_indx = pred_indx[0]
             pred_class = df_pred[1][pred_indx]
 
+        # if gt_class == "A" and pred_class == "A":
+        #     TP = TP + 1
+        # if gt_class == "N" and pred_class == "N":
+        #     TN = TN + 1
+        # if gt_class == "N" and pred_class == "A":
+        #     FP = FP + 1
+        # if gt_class == "A" and pred_class == "N":
+        #     FN = FN + 1
         if gt_class == "A" and pred_class == "A":
             TP = TP + 1
-        if gt_class == "N" and pred_class == "N":
+        if gt_class != "A" and pred_class != "A":
             TN = TN + 1
-        if gt_class == "N" and pred_class == "A":
+        if gt_class != "A" and pred_class == "A":
             FP = FP + 1
-        if gt_class == "A" and pred_class == "N":
+        if gt_class == "A" and pred_class != "A":
             FN = FN + 1
 
         if gt_class == "N":

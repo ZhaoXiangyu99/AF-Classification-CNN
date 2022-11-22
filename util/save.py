@@ -46,7 +46,7 @@ def save_predictions(predictions: List[Tuple[str, str, any]], folder: str = None
         for prediction in predictions:
             predictions_writer.writerow([prediction[0], prediction[1], prediction[2]])
         # 显示信息保存了多少标签（预测）
-        print("有{}条标签被保存.".format(len(predictions)))
+        print("{} labels are saved.".format(len(predictions)))
 
 def save_score(f1:float, f1_mult:float, accuracy:float, precision:float, recall:float,folder: str= "") -> None:
     if folder == "":

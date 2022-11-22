@@ -164,9 +164,7 @@ def predict_my_model(ecg_leads: List[np.ndarray], fs: int, ecg_names: List[str],
         try:
             state_dict = torch.load(model, map_location=device)
         except FileNotFoundError as _:
-            print("State dict not found. Download the state dict of ECG-DualNet XL (Icentia11k). "
-                  "Link in README. Put the state dict into the relative directory "
-                  "experiments/21_05_2021__12_15_06ECGCNN_XL_icentia11k_dataset/models/")
+            print("State dict not found, please check the path of state dict")
             exit(1904)
         model_state_dict = network.state_dict()
         state_dict = {key: value for key, value in state_dict.items() if model_state_dict[key].shape == value.shape}
@@ -180,17 +178,13 @@ def predict_my_model(ecg_leads: List[np.ndarray], fs: int, ecg_names: List[str],
             try:
                 state_dict = torch.load(model, map_location=device)
             except FileNotFoundError as _:
-                print("State dict not found. Download the state dict of ECG-DualNet XL (two class, challange). "
-                      "Link in README. Put the state dict into the relative directory "
-                      "experiments/17_12_2021__03_39_19ECGCNN_XL_physio_net_dataset_challange_two_classes/models/")
+                print("State dict not found, please check the path of state dict")
                 exit(1904)
         else:
             try:
                 state_dict = torch.load(model, map_location=device)
             except FileNotFoundError as _:
-                print("State dict not found. Download the state dict of ECG-DualNet XL (four class, challange). "
-                      "Link in README. Put the state dict into the relative directory,such as "
-                      "experiments/25_05_2021__02_02_11ECGCNN_XL_physio_net_dataset_challange/models/")
+                print("State dict not found, please check the path of state dict")
                 exit(1904)
         # Apply state dict
         network.load_state_dict(state_dict)
@@ -223,6 +217,8 @@ if __name__ == '__main__':
                     help="Binary flag. If set two classes are utilized. ")
     parser.add_argument("--devices", default="cuda:0", type=str,
                     help="String of cuda device indexes to be used. Indexes must be separated by a comma.")
+    parser.add_argument("--file_type", default="mat", type=str,
+                    help="suffix of data file")
 
     # Get arguments
     args = parser.parse_args()
@@ -257,7 +253,7 @@ if __name__ == '__main__':
         folder = args.save_prediction + "/AttNet/" + datetime.now().strftime("%Y_%m_%d") + "/XXL" 
     else:
         config = ECGAttNet_CONFIG_130M
-        folder = folder = args.save_prediction + "/AttNet/" + datetime.now().strftime("%Y_%m_%d") + "/130M"
+        folder = args.save_prediction + "/AttNet/" + datetime.now().strftime("%Y_%m_%d") + "/130M"
     
     if args.two_class:
        config["classes"] = 2
@@ -268,10 +264,10 @@ if __name__ == '__main__':
         network = ECGAttNet(config=config)
 
     # Load Data and Reference
-    ecg_leads, _, ecg_names = load_data_references(args.test_data) 
+    ecg_leads, _, ecg_names = load_data_references(args.test_data, file_type=args.file_type) 
 
     # Prediction
-    predictions = predict_my_model(ecg_leads, args.fs, ecg_names, use_pretrained=args.use_pretrained, model=args.model_path, 
+    predictions = predict_my_model(ecg_leads=ecg_leads, fs=args.fs, ecg_names=ecg_names, use_pretrained=args.use_pretrained, model=args.model_path, 
                                     device=args.devices, network=network, is_binary_classifier=args.two_class)
     # Save Prediction
     save_predictions(predictions,folder=folder)                   

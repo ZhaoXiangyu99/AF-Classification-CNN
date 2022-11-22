@@ -4,6 +4,7 @@ import scipy.io as sio
 import numpy as np
 import os
 import pandas as pd
+from .preprocess import preprocess_ecg
 
 def load_references(folder: str) -> Tuple[List[np.ndarray], List[str], List[str]]:
     """
@@ -42,11 +43,11 @@ def load_references(folder: str) -> Tuple[List[np.ndarray], List[str], List[str]
             ecg_labels.append(row[1])          # 标签,即所属类别
             ecg_names.append(row[0])           # ecg文件名
     # 显示加载了多少数据
-    print("加载了{}条数据.".format(len(ecg_leads)))
+    print("{} items of data are loaded.".format(len(ecg_leads)))
     return ecg_leads, ecg_labels, ecg_names
 
 # load data and reference
-def load_data_references(folder: str) -> Tuple[List[np.ndarray], List[str], List[str]]:
+def load_data_references(folder: str, file_type: str = "mat") -> Tuple[List[np.ndarray], List[str], List[str]]:
     """
     Parameters
     ----------
@@ -77,8 +78,9 @@ def load_data_references(folder: str) -> Tuple[List[np.ndarray], List[str], List
         csv_reader = csv.reader(csv_file, delimiter=',')
         # 遍历每一行
         for row in csv_reader:
-            ecg_data = load_data(folder=folder, file_name=row[0], file_type="mat")
-            ecg_leads.append(ecg_data)     # ecg信号值
+            ecg_data = load_data(folder=folder, file_name=row[0], file_type=file_type)
+            pp_ecg_data = preprocess_ecg(ecg_signal=ecg_data, fs=500)
+            ecg_leads.append(pp_ecg_data)     # ecg信号值
             ecg_labels.append(row[1])      # 标签,即所属类别
             ecg_names.append(row[0])       # ecg文件名
     # 显示加载了多少数据
